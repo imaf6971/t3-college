@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "mysql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -14,10 +14,58 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Student {
+    id              BigInt           @id @default(autoincrement())
+    firstName       String
+    lastName        String
+    patronymic      String
+    group           Group            @relation(fields: [groupId], references: [id])
+    groupId         BigInt
+    Course          Course[]
+    CouncilPosition CouncilPosition?
+}
+
+model Faculty {
+    id     BigInt  @id @default(autoincrement())
+    code   String  @db.VarChar(4)
+    title  String
+    groups Group[]
+}
+
+model Group {
+    id                BigInt    @id @default(autoincrement())
+    admissionYear     Int       @db.Year
+    isAfterHighSchool Boolean
+    num               Bytes
+    Faculty           Faculty   @relation(fields: [facultyId], references: [id])
+    facultyId         BigInt
+    Student           Student[]
+}
+
+model Course {
+    id       BigInt    @id @default(autoincrement())
+    title    String
+    students Student[]
+}
+
+model CouncilPosition {
+    id        BigInt  @id @default(autoincrement())
+    title     String
+    student   Student @relation(fields: [studentId], references: [id])
+    studentId BigInt  @unique
+}
+
+model Module {
+    id            BigInt      @id @default(autoincrement())
+    title         String
+    plannedEvents EventPlan[]
+}
+
+model EventPlan {
+    id       BigInt @id @default(autoincrement())
+    title    String
+    Module   Module @relation(fields: [moduleId], references: [id])
+    moduleId BigInt
 }
 
 // Necessary for Next auth
@@ -27,12 +75,12 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String? // @db.Text
+    id_token          String? @db.Text
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
