@@ -43,9 +43,11 @@ model Group {
 }
 
 model Course {
-    id       BigInt    @id @default(autoincrement())
-    title    String
-    students Student[]
+    id           BigInt          @id @default(autoincrement())
+    title        String
+    students     Student[]
+    leadership   CouncilPosition @relation(fields: [leadershipId], references: [id])
+    leadershipId BigInt          @unique
 }
 
 model CouncilPosition {
@@ -53,6 +55,7 @@ model CouncilPosition {
     title     String
     student   Student @relation(fields: [studentId], references: [id])
     studentId BigInt  @unique
+    Course    Course?
 }
 
 model Module {
