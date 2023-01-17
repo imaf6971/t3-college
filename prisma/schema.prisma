@@ -36,7 +36,7 @@ model Group {
     id                BigInt    @id @default(autoincrement())
     admissionYear     Int       @db.Year
     isAfterHighSchool Boolean
-    num               Bytes
+    num               Int
     Faculty           Faculty   @relation(fields: [facultyId], references: [id])
     facultyId         BigInt
     Student           Student[]
